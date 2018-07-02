@@ -13,7 +13,6 @@ Plug 'mhartington/oceanic-next'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tomtom/tcomment_vim'
 Plug 'terryma/vim-multiple-cursors'
-Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-rails'
 Plug 'flazz/vim-colorschemes'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
@@ -27,58 +26,17 @@ Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-fugitive'
 Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
+Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'matze/vim-move'
 Plug 'carlitux/deoplete-ternjs'
 Plug 'ryanoasis/vim-devicons'
 Plug 'tpope/vim-bundler'
-Plug 'vim-scripts/VimClojure'
-"Plug 'mbbill/undotree'
-"Plug 'KabbAmine/vCoolor.vim'
-"Plug 'elzr/vim-json'
-"Plug 'vim-ruby/vim-ruby'
-"Plug 'rking/ag.vim'
-"Plug 'Shougo/neosnippet'
-"Plug 'fatih/vim-go'
-"Plug 'Shougo/neosnippet-snippets'
-"Plug 'elixir-lang/vim-elixir'
-"Plug 'thinca/vim-ref'
-"Plug 'mhinz/vim-hugefile'
-"Plug 'tpope/vim-dispatch'
-"Plug 'radenling/vim-dispatch-neovim'
-"Plug 'sheerun/vim-polyglot'
-"Plug 'floobits/floobits-neovim'
-"Plug 'junegunn/goyo.vim'
-"Plug 'junegunn/limelight.vim'
-"Plug 'alvan/vim-closetag'
-"Plug 'mattn/emmet-vim'
-"Plug 'JamshedVesuna/vim-markdown-preview'
-"Plug 'chriskempson/base16-vim'
-if has('nvim')
-  "Plug 'awetzel/elixir.nvim', { 'do': 'yes \| ./install.sh' }
-  "lug 'slashmili/alchemist.vim'
-  function! DoRemote(arg)
-    UpdateRemotePlugins
-  endfunction
-  Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-endif
+Plug 'prettier/vim-prettier'
+Plug 'misterbuckley/vim-definitive'
 call plug#end()
-nnoremap <Esc> :noh<CR><Esc>
-let mapleader=","
-noremap <silent> <F4> :let @+=expand("%:p")<CR>
-noremap <Leader>m :NERDTreeToggle<CR>
-noremap <Leader>f :FZF<CR>
-noremap <Leader>a :Ag<CR>
-inoremap jj <ESC>
-autocmd! BufWritePost .config/nvim/init.vim source %
-autocmd BufWritePre * StripWhitespace
-if (has('termguicolors') && $TERM_PROGRAM ==# 'iTerm.app' && $TERM !~# '^\%(screen\|tmux\)')
-    set termguicolors
-  else
-    set notermguicolors
-  endif
-autocmd! BufWritePost,BufEnter * Neomake
-"Remove all trailing whitespace by pressing F5
+
+set notermguicolors
+
 syntax enable
 syntax on
 filetype plugin indent on
@@ -102,26 +60,78 @@ set synmaxcol=128
 set lazyredraw
 set foldmethod=indent
 set foldlevel=99
+let mapleader=","
+map <silent> <space>h <C-W>h
+map <silent> <space>j <C-W>j
+map <silent> <space>k <C-W>k
+map <silent> <space>l <C-W>l
+
 syntax sync minlines=256
+
+"================PRETTIER====================
+autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
+let g:prettier#autoformat = 0
+"============================================
+
 "let g:srcery_inverse= 1
-"====================================================:q
+"===================================================="
 "
-let g:NERDTreeFileExtensionHighlightFullName = 1
-let g:NERDTreeExactMatchHighlightFullName = 1
-let g:NERDTreePatternMatchHighlightFullName = 1
-let g:NERDTreeHighlightFolders = 1 " enables folder icon highlighting using exact match
-let g:NERDTreeHighlightFoldersFullName = 1 " highlights the folder name
+"let g:NERDTreeFileExtensionHighlightFullName = 1
+"let g:NERDTreeExactMatchHighlightFullName = 1
+"let g:NERDTreePatternMatchHighlightFullName = 1
+"let g:NERDTreeHighlightFolders = 1 " enables folder icon highlighting using exact match
+"let g:NERDTreeHighlightFoldersFullName = 1 " highlights the folder name
+"==================================================="
+let NERDTreeMapOpenSplit = 'x'
+let NERDTreeMapOpenVSplit = 'v'
+let g:vim_jsx_pretty_colorful_config = 1
+
+function! OpenPR()
+  let current_branch = system('git rev-parse --abbrev-ref HEAD')
+  execute '!open' . " " . "https://github.com/Thinkei/employment-hero/pull/" . current_branch
+endfunction
+
+function! CreatePR(root)
+  let current_branch = system('git rev-parse --abbrev-ref HEAD')
+  execute '!open' . " " . "https://github.com/Thinkei/employment-hero/compare/" . a:root . "..." . current_branch
+endfunction
+
+function! RunCustom()
+  execute ':e ~/.config/nvim/init.vim'
+endfunction
+
+nnoremap <Esc> :noh<CR><Esc>
+noremap <silent> <F4> :let @+=expand("%:p")<CR>
+noremap <leader>m :NERDTreeToggle<CR>
+noremap <Space><Space> :w!<CR>
+noremap <Space>q :q<CR>
+noremap <Space>c :call RunCustom()<CR>
+noremap <leader>f :FZF<CR>
+noremap <leader>a :Ag<CR>
+noremap <leader>w :Ag <<<<<CR>
+inoremap jj <ESC>
+autocmd! BufWritePost .config/nvim/init.vim source %
+autocmd BufWritePre * StripWhitespace
+autocmd! BufWritePost,BufEnter * Neomake
+map <leader>s :call CreatePR("staging")<CR>
+map <leader>d :call CreatePR("development")<CR>
+map <leader>o :call OpenPR()<CR>
 map <leader>r :NERDTreeFind<cr>
+map <leader>t :%!expand -t2<cr>
+map <leader>e :e!<cr>
+map <leader>c :e ~/.config/nvim/init.vim<cr>
+nnoremap <space>d :FindDefinition<CR>
+noremap <Space>t :tabedit %<CR>
 
 " Run current cucumber scenario
 "========================================================
 " CONFIG Cucumber
 "========================================================
 let test#strategy = "neovim"
-map <Leader>tt :TestFile<CR>
-map <Leader>ts :TestNearest<CR>
-map <Leader>tl :TestLast<CR>
-map <Leader>ta :TestSuite<CR>
+map <leader>tt :TestFile<CR>
+map <leader>ts :TestNearest<CR>
+map <leader>tl :TestLast<CR>
+map <leader>ta :TestSuite<CR>
 "========================================================
 " CONFIG NEOMAKE
 "========================================================
@@ -131,8 +141,6 @@ let s:eslint_path = system('PATH=$(npm bin):$PATH && which eslint')
 let g:neomake_javascript_eslint_exe = substitute(s:eslint_path, '^\n*\s*\(.\{-}\)\n*\s*$', '\1', '')
 
 let g:neomake_ruby_enabled_makers = ['rubocop']
-"let g:neomake_error_sign = {'text': '💧', 'texthl': 'NeomakeWarningMsg'}
-"let g:neomake_warning_sign = {'text': '💧', 'texthl': 'NeomakeErrorMsg'}
 "========================================================
 " CONFIG AIRLINE THEME
 "========================================================
@@ -143,6 +151,7 @@ let g:move_key_modifier= 'C'
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
+
 " Update ruby ctags
 function! URT()
   return system('ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)')
@@ -162,7 +171,10 @@ let g:airline#extensions#default#layout = [
       \ [ 'a', 'b', 'c' ],
       \ [ 'z', 'error', 'warning' ]]
 "==============================================================
+" CONFIG JSX
+"==============================================================
+"==============================================================
 " CONFIG CLOJURE
 "==============================================================
-let g:vimclojure#HighlightBuiltins = 1
-let g:vimclojure#ParenRainbow = 1
+"let g:vimclojure#HighlightBuiltins = 1
+"let g:vimclojure#ParenRainbow = 1
