@@ -96,6 +96,11 @@ function! CreatePR(root)
   execute '!open' . " " . "https://github.com/Thinkei/employment-hero/compare/" . a:root . "..." . current_branch
 endfunction
 
+function! CreatePRFrontEnd(root)
+  let current_branch = system('git rev-parse --abbrev-ref HEAD')
+  execute '!open' . " " . "https://github.com/Thinkei/frontend-core/compare/" . a:root . "..." . current_branch
+endfunction
+
 function! RunCustom()
   execute ':e ~/.config/nvim/init.vim'
 endfunction
@@ -113,12 +118,12 @@ inoremap jj <ESC>
 autocmd! BufWritePost .config/nvim/init.vim source %
 autocmd BufWritePre * StripWhitespace
 autocmd! BufWritePost,BufEnter * Neomake
-map <leader>s :call CreatePR("staging")<CR>
+map <leader>s :call CreatePR("sandbox/payroll")<CR>
 map <leader>d :call CreatePR("development")<CR>
+map <leader>e :call CreatePRFrontEnd("master")<CR>
 map <leader>o :call OpenPR()<CR>
 map <leader>r :NERDTreeFind<cr>
 map <leader>t :%!expand -t2<cr>
-map <leader>e :e!<cr>
 map <leader>c :e ~/.config/nvim/init.vim<cr>
 nnoremap <space>d :FindDefinition<CR>
 noremap <Space>t :tabedit %<CR>
@@ -152,12 +157,6 @@ if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
 
-" Update ruby ctags
-function! URT()
-  return system('ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)')
-endfunction
-map <silent> <leader>urt <ESC>:call URT()<CR>
-map <c-]> <ESC>:call fzf#vim#tags(expand("<cword>"), fzf#vim#layout(expand("<bang>0")))<cr>
 let g:airline_powerline_fonts = 1
 let g:airline_left_sep = '⭔'
 let g:airline_left_alt_sep = ''
@@ -170,11 +169,3 @@ let g:airline#extensions#branch#displayed_head_limit = 10
 let g:airline#extensions#default#layout = [
       \ [ 'a', 'b', 'c' ],
       \ [ 'z', 'error', 'warning' ]]
-"==============================================================
-" CONFIG JSX
-"==============================================================
-"==============================================================
-" CONFIG CLOJURE
-"==============================================================
-"let g:vimclojure#HighlightBuiltins = 1
-"let g:vimclojure#ParenRainbow = 1
